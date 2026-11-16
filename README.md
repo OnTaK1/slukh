@@ -322,7 +322,7 @@ Slukh считает **твою** статистику за то же окно �
 ### Шаги
 
 ```bash
-git clone https://github.com/<твой-ник>/slukh.git
+git clone https://github.com/OnTaK1/slukh.git
 cd slukh
 ```
 
