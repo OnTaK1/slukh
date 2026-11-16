@@ -1,0 +1,29 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Android Studio
+.idea/
+*.iml
+local.properties
+captures/
+.cxx/
+
+# Подписи и секреты
+*.jks
+*.keystore
+keystore.properties
+
+# Личная история (резервные копии базы)
+*.db
+*.db-wal
+*.db-shm
+
+# Сборки
+*.apk
+*.aab
+
+# Система
+.DS_Store
+Thumbs.db
