@@ -23,6 +23,8 @@ keystore.properties
 # Сборки
 *.apk
 *.aab
+app/release/
+
 
 # Система
 .DS_Store
