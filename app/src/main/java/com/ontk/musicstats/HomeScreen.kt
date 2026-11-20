@@ -72,6 +72,10 @@ fun HomeScreen() {
             )
         }
 
+        if (UpdateChecker.visible() != null) {
+            item { UpdateBanner() }
+        }
+
         if (!hasAccess) {
             item {
                 Panel {

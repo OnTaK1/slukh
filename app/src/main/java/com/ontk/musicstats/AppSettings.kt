@@ -40,6 +40,26 @@ object AppSettings {
     var profileId by mutableStateOf("")
         private set
 
+    /** Папка (SAF) для автоматической резервной копии. Пусто: автокопия выключена. */
+    var autoBackupUri by mutableStateOf("")
+        private set
+
+    var lastBackupAt by mutableStateOf(0L)
+        private set
+
+    /** Один раз удалили из истории рекламные вставки. */
+    var adsPurged by mutableStateOf(false)
+        private set
+
+    var checkUpdates by mutableStateOf(true)
+        private set
+
+    var skippedVersion by mutableStateOf("")
+        private set
+
+    var lastUpdateCheck by mutableStateOf(0L)
+        private set
+
     /** Прошёл ли пользователь приветствие */
     var onboarded by mutableStateOf(false)
         private set
@@ -62,6 +82,12 @@ object AppSettings {
             p.edit().putString("profile_id", pid).apply()
         }
         profileId = pid
+        autoBackupUri = p.getString("auto_backup_uri", "").orEmpty()
+        lastBackupAt = p.getLong("last_backup_at", 0L)
+        adsPurged = p.getBoolean("ads_purged", false)
+        checkUpdates = p.getBoolean("check_updates", true)
+        skippedVersion = p.getString("skipped_version", "").orEmpty()
+        lastUpdateCheck = p.getLong("last_update_check", 0L)
         onboarded = p.getBoolean("onboarded", false)
     }
 
@@ -98,6 +124,41 @@ object AppSettings {
     fun setProfileName(context: Context, name: String) {
         profileName = name.take(24)
         prefs(context).edit().putString("profile_name", profileName).apply()
+    }
+
+    fun setProfileId(context: Context, id: String) {
+        profileId = id
+        prefs(context).edit().putString("profile_id", id).apply()
+    }
+
+    fun setAutoBackupUri(context: Context, uri: String) {
+        autoBackupUri = uri
+        prefs(context).edit().putString("auto_backup_uri", uri).apply()
+    }
+
+    fun setLastBackupAt(context: Context, time: Long) {
+        lastBackupAt = time
+        prefs(context).edit().putLong("last_backup_at", time).apply()
+    }
+
+    fun setAdsPurged(context: Context, value: Boolean) {
+        adsPurged = value
+        prefs(context).edit().putBoolean("ads_purged", value).apply()
+    }
+
+    fun setCheckUpdates(context: Context, value: Boolean) {
+        checkUpdates = value
+        prefs(context).edit().putBoolean("check_updates", value).apply()
+    }
+
+    fun setSkippedVersion(context: Context, tag: String) {
+        skippedVersion = tag
+        prefs(context).edit().putString("skipped_version", tag).apply()
+    }
+
+    fun setLastUpdateCheck(context: Context, time: Long) {
+        lastUpdateCheck = time
+        prefs(context).edit().putLong("last_update_check", time).apply()
     }
 
     fun setPlaylistPlayer(context: Context, pkg: String) {

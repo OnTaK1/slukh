@@ -136,6 +136,7 @@ class MusicListenerService : NotificationListenerService() {
         private var artist = ""
         private var title = ""
         private var album = ""
+        private var mediaId: String? = null
         private var durationSec = 0L
         private var startedAt = 0L
         private var playedMs = 0L
@@ -169,6 +170,11 @@ class MusicListenerService : NotificationListenerService() {
         /** Сообщает интерфейсу, что сейчас играет (или стоит на паузе). */
         private fun publish(playing: Boolean) {
             if (title.isEmpty()) return
+            if (AdFilter.isAd(artist, title, controller.packageName, mediaId)) {
+                // рекламу не показываем как «сейчас играет»
+                if (NowPlaying.pkg == controller.packageName) NowPlaying.playing = false
+                return
+            }
             val pkg = controller.packageName
             if (playing || NowPlaying.pkg == pkg) {
                 NowPlaying.artist = artist
@@ -183,11 +189,13 @@ class MusicListenerService : NotificationListenerService() {
             val newTitle = md?.getString(MediaMetadata.METADATA_KEY_TITLE)?.trim().orEmpty()
             val newAlbum = md?.getString(MediaMetadata.METADATA_KEY_ALBUM).orEmpty()
             val newDuration = (md?.getLong(MediaMetadata.METADATA_KEY_DURATION) ?: 0L) / 1000
+            val newMediaId = md?.getString(MediaMetadata.METADATA_KEY_MEDIA_ID)
 
             if (newArtist == artist && newTitle == title) {
                 // тот же трек: длительность могла прийти позже
                 album = newAlbum
                 durationSec = newDuration
+                mediaId = newMediaId
                 scheduleCheck()
                 if (resumedAt != 0L) publish(true)
                 return
@@ -197,6 +205,7 @@ class MusicListenerService : NotificationListenerService() {
             title = newTitle
             album = newAlbum
             durationSec = newDuration
+            mediaId = newMediaId
             if (isPlaying(controller.playbackState)) {
                 beginSegment()
                 publish(true)
@@ -249,6 +258,10 @@ class MusicListenerService : NotificationListenerService() {
             if (threshold < 0 || currentPlayedMs() < threshold * 1000) return
             if (!db.isAppEnabled(controller.packageName)) return
             counted = true
+            if (AdFilter.isAd(artist, title, controller.packageName, mediaId)) {
+                Log.d("MusicStats", "Пропущено (реклама): $artist — $title")
+                return
+            }
             val parsed = TrackParser.parse(artist, title, controller.packageName)
             if (parsed == null) {
                 Log.d("MusicStats", "Пропущено (не музыка): $artist — $title")
@@ -260,6 +273,7 @@ class MusicListenerService : NotificationListenerService() {
             )
             NowPlaying.version++
             GenreResolver.requestMissing(applicationContext)
+            Backup.autoBackupIfNeeded(applicationContext)
             Log.d(
                 "MusicStats",
                 "Засчитано: ${parsed.artists.joinToString(", ")} — ${parsed.title}"
@@ -282,6 +296,7 @@ class MusicListenerService : NotificationListenerService() {
             artist = ""
             title = ""
             album = ""
+            mediaId = null
             durationSec = 0L
             startedAt = 0L
             playedMs = 0L

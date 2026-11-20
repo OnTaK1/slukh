@@ -185,6 +185,8 @@ fun SettingsScreen() {
 
         item { KeySetupCard() }
 
+        item { BackupPanel() }
+        item { UpdatePanel() }
         item {
             Panel {
                 CardTitle("тема")

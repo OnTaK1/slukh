@@ -103,7 +103,10 @@ fun MainScreen() {
     var tab by rememberSaveable { mutableIntStateOf(0) }
     val now = rememberNowInfo(db)
 
-    LaunchedEffect(Unit) { GenreResolver.requestMissing(context) }
+    LaunchedEffect(Unit) {
+        GenreResolver.requestMissing(context)
+        Maintenance.onAppStart(context)
+    }
 
     // приветствие для новых пользователей
     if (!AppSettings.onboarded) {
