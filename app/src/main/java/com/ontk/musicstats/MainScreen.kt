@@ -51,6 +51,11 @@ private fun NavIcon(kind: Int, color: Color) {
                 drawRoundRect(color, Offset(w * 0.42f, h * 0.2f), Size(bw, h * 0.66f), CornerRadius(bw / 2))
                 drawRoundRect(color, Offset(w * 0.70f, h * 0.36f), Size(bw, h * 0.5f), CornerRadius(bw / 2))
             }
+            4 -> { // музыка: нота
+                drawCircle(color, radius = w * 0.17f, center = Offset(w * 0.34f, h * 0.74f))
+                drawLine(color, Offset(w * 0.5f, h * 0.74f), Offset(w * 0.5f, h * 0.18f), strokeWidth = stroke, cap = StrokeCap.Round)
+                drawLine(color, Offset(w * 0.5f, h * 0.18f), Offset(w * 0.82f, h * 0.3f), strokeWidth = stroke, cap = StrokeCap.Round)
+            }
             3 -> { // друзья: два пересекающихся кольца
                 val r = w * 0.27f
                 drawCircle(color, radius = r, center = Offset(w * 0.36f, h * 0.5f), style = Stroke(width = stroke))
@@ -133,7 +138,7 @@ fun MainScreen() {
         contentColor = cs.onBackground,
         bottomBar = {
             Column {
-                if (tab != 0 && now != null) MiniPlayer(now)
+                if (tab != 0 && tab != 4 && now != null) MiniPlayer(now)
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -147,6 +152,7 @@ fun MainScreen() {
                 ) {
                     NavItem(tab == 0, "Главная", 0) { tab = 0 }
                     NavItem(tab == 1, "Итоги", 1) { tab = 1 }
+                    NavItem(tab == 4, "Музыка", 4) { tab = 4 }
                     NavItem(tab == 3, "Друзья", 3) { tab = 3 }
                     NavItem(tab == 2, "Настройки", 2) { tab = 2 }
                 }
@@ -158,6 +164,7 @@ fun MainScreen() {
                 0 -> HomeScreen()
                 1 -> RecapScreen()
                 3 -> FriendsScreen()
+                4 -> LibraryScreen()
                 else -> SettingsScreen()
             }
         }

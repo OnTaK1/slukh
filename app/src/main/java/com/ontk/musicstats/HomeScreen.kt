@@ -58,6 +58,11 @@ fun HomeScreen() {
         Moods.compute(list, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.DAY_OF_YEAR))
     }
     val topGenre = recentGenres.firstOrNull()?.first
+    val suggestion = remember(version, Suggestions.tick, AppSettings.suggestionsEnabled, AppSettings.suggestMinPlays) {
+        if (AppSettings.suggestionsEnabled) {
+            Suggestions.compute(db, AppSettings.suggestMinPlays, context.packageName)
+        } else null
+    }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -74,6 +79,10 @@ fun HomeScreen() {
 
         if (UpdateChecker.visible() != null) {
             item { UpdateBanner() }
+        }
+
+        if (suggestion != null) {
+            item { SuggestionCard(suggestion) }
         }
 
         if (!hasAccess) {

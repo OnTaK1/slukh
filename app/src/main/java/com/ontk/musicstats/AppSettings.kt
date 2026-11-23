@@ -60,6 +60,17 @@ object AppSettings {
     var lastUpdateCheck by mutableStateOf(0L)
         private set
 
+    var suggestionsEnabled by mutableStateOf(true)
+        private set
+
+    /** После скольких прослушиваний за две недели предлагать действие с треком. */
+    var suggestMinPlays by mutableStateOf(3)
+        private set
+
+    /** Папки с музыкой, выбранные через системный выбор (SAF). */
+    var libraryTrees by mutableStateOf(listOf<String>())
+        private set
+
     /** Прошёл ли пользователь приветствие */
     var onboarded by mutableStateOf(false)
         private set
@@ -88,6 +99,9 @@ object AppSettings {
         checkUpdates = p.getBoolean("check_updates", true)
         skippedVersion = p.getString("skipped_version", "").orEmpty()
         lastUpdateCheck = p.getLong("last_update_check", 0L)
+        suggestionsEnabled = p.getBoolean("suggestions", true)
+        suggestMinPlays = p.getInt("suggest_min", 3)
+        libraryTrees = p.getString("library_trees", "").orEmpty().split('\n').filter { it.isNotBlank() }
         onboarded = p.getBoolean("onboarded", false)
     }
 
@@ -159,6 +173,31 @@ object AppSettings {
     fun setLastUpdateCheck(context: Context, time: Long) {
         lastUpdateCheck = time
         prefs(context).edit().putLong("last_update_check", time).apply()
+    }
+
+    fun setSuggestionsEnabled(context: Context, value: Boolean) {
+        suggestionsEnabled = value
+        prefs(context).edit().putBoolean("suggestions", value).apply()
+    }
+
+    fun setSuggestMinPlays(context: Context, value: Int) {
+        suggestMinPlays = value
+        prefs(context).edit().putInt("suggest_min", value).apply()
+    }
+
+    private fun saveTrees(context: Context) {
+        prefs(context).edit().putString("library_trees", libraryTrees.joinToString("\n")).apply()
+    }
+
+    fun addLibraryTree(context: Context, uri: String) {
+        if (uri in libraryTrees) return
+        libraryTrees = libraryTrees + uri
+        saveTrees(context)
+    }
+
+    fun removeLibraryTree(context: Context, uri: String) {
+        libraryTrees = libraryTrees - uri
+        saveTrees(context)
     }
 
     fun setPlaylistPlayer(context: Context, pkg: String) {

@@ -141,6 +141,19 @@ object Backup {
         }
         w.endArray()
 
+        w.name("favorites").beginArray()
+        rdb.rawQuery("SELECT track_key, artists, title, package FROM favorites", null).use { c ->
+            while (c.moveToNext()) {
+                w.beginObject()
+                w.name("k").value(c.getString(0))
+                w.name("a").value(c.getString(1))
+                w.name("t").value(c.getString(2))
+                w.name("p").value(c.getString(3))
+                w.endObject()
+            }
+        }
+        w.endArray()
+
         w.endObject()
         w.close()
     }
@@ -398,6 +411,28 @@ object Backup {
                                 }
                                 r.endObject()
                                 if (pkg.isNotEmpty()) db.registerApp(pkg, enabled)
+                            }
+                            r.endArray()
+                        }
+                        "favorites" -> {
+                            r.beginArray()
+                            while (r.hasNext()) {
+                                var key = ""
+                                var artists = ""
+                                var title = ""
+                                var pkg = ""
+                                r.beginObject()
+                                while (r.hasNext()) {
+                                    when (r.nextName()) {
+                                        "k" -> key = r.stringOrNull().orEmpty()
+                                        "a" -> artists = r.stringOrNull().orEmpty()
+                                        "t" -> title = r.stringOrNull().orEmpty()
+                                        "p" -> pkg = r.stringOrNull().orEmpty()
+                                        else -> r.skipValue()
+                                    }
+                                }
+                                r.endObject()
+                                if (key.isNotEmpty() && title.isNotEmpty()) db.addFavorite(key, artists, title, pkg)
                             }
                             r.endArray()
                         }

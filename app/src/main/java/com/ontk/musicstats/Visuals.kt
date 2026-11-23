@@ -57,6 +57,7 @@ data class NowInfo(
 )
 
 fun sourceName(pkg: String): String = when {
+    pkg == "com.ontk.musicstats" -> "Slukh"
     pkg.contains("youtube.music") -> "YouTube Music"
     pkg.contains("youtube") -> "YouTube"
     pkg.contains("vkontakte") || pkg.contains(".vk.") || pkg.contains("musicvk") -> "VK"

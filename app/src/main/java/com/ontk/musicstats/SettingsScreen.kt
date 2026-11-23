@@ -184,7 +184,7 @@ fun SettingsScreen() {
         }
 
         item { KeySetupCard() }
-
+        item { SuggestionsPanel() }
         item { BackupPanel() }
         item { UpdatePanel() }
         item {

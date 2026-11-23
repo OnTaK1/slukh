@@ -22,13 +22,14 @@ data class ArtistStat(
 )
 
 class StatsDb private constructor(context: Context) :
-    SQLiteOpenHelper(context, "stats.db", null, 6) {
+    SQLiteOpenHelper(context, "stats.db", null, 7) {
 
     override fun onCreate(db: SQLiteDatabase) {
         createPlayTables(db)
         db.execSQL("CREATE TABLE apps (package TEXT PRIMARY KEY, enabled INTEGER NOT NULL)")
         createGenreTable(db)
         createFriendsTable(db)
+        createLibraryTables(db)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -48,6 +49,9 @@ class StatsDb private constructor(context: Context) :
         }
         if (oldVersion < 6) {
             createFriendsTable(db)
+        }
+        if (oldVersion < 7) {
+            createLibraryTables(db)
         }
     }
 
